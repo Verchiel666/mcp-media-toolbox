@@ -1,0 +1,17 @@
+{
+  "name": "mcp-media-toolbox",
+  "version": "1.3.2",
+  "description": "Zero-dependency MCP server for media probing, AAC audio extraction and EXIF — no ffmpeg, no Python. Runs where you cannot install binaries (Android app sandbox, Termux, minimal containers).",
+  "type": "module",
+  "bin": { "mcp-media-toolbox": "server.mjs" },
+  "main": "server.mjs",
+  "files": ["server.mjs", "README.md", "LICENSE", "docs/"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.mjs",
+    "selftest": "node selftest.mjs",
+    "fixtures": "node scripts/make-fixtures.mjs"
+  },
+  "keywords": ["mcp", "model-context-protocol", "video", "metadata", "mp4", "aac", "exif", "no-ffmpeg", "android"],
+  "license": "MIT"
+}

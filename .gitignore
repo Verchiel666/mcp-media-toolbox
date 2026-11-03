@@ -1,0 +1,5 @@
+node_modules/
+.selftest/
+*.aac
+!fixtures/*.aac
+.DS_Store
