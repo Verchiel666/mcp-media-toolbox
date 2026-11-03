@@ -43,7 +43,22 @@ node client.mjs --demo
 }
 ```
 
-发布到 npm 后也可以直接 `npx mcp-media-toolbox`（`bin` 已配好）。
+已发布到 npm，可以直接用 npx（无需 clone）：
+
+```json
+{
+  "mcpServers": {
+    "media-toolbox": {
+      "command": "npx",
+      "args": ["-y", "mcp-media-toolbox"]
+    }
+  }
+}
+```
+
+```bash
+npx -y mcp-media-toolbox   # 直接作为 stdio server 启动
+```
 
 ## 工具
 
@@ -96,6 +111,10 @@ node client.mjs --list --server experiments/server-pretty.mjs   # 看它怎么�
 
 DSH 引擎自带 `@deepseek-ai/dsh-mcp-client`，但 App 的设置页只接受远程 HTTP / npm 包，
 **拒绝本地 `node script.mjs` 这种写法**。可行方式与踩坑记录见 [docs/dsh-android.md](docs/dsh-android.md)。
+
+## 在 npm 上
+
+[`mcp-media-toolbox`](https://www.npmjs.com/package/mcp-media-toolbox) —— 只发布 `server.mjs` 与文档，测试素材不进包（21.6 KiB）。
 
 ## 相关
 
