@@ -24,7 +24,7 @@
 ## 快速开始
 
 ```bash
-git clone <this repo> && cd mcp-media-toolbox
+git clone https://github.com/Verchiel666/mcp-media-toolbox.git && cd mcp-media-toolbox
 npm run fixtures      # 生成合成测试素材（仓库里没有第三方二进制）
 npm run selftest      # 21 项断言，退出码 0 = 全过
 node client.mjs --demo
@@ -96,6 +96,10 @@ node client.mjs --list --server experiments/server-pretty.mjs   # 看它怎么�
 
 DSH 引擎自带 `@deepseek-ai/dsh-mcp-client`，但 App 的设置页只接受远程 HTTP / npm 包，
 **拒绝本地 `node script.mjs` 这种写法**。可行方式与踩坑记录见 [docs/dsh-android.md](docs/dsh-android.md)。
+
+## 相关
+
+同源的姊妹项目：[DSH](https://deepseek-harness.github.io/deepseek-harness/)（本项目的 MCP 桥接就是在它上面验证的）。
 
 ## License
 
