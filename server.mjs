@@ -22,9 +22,12 @@ import path from 'node:path';
 import os from 'node:os';
 import crypto from 'node:crypto';
 import readline from 'node:readline';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 const SERVER_NAME = 'node7-media-toolbox';
-const SERVER_VERSION = '1.3.1';
+const SERVER_VERSION = require('./package.json').version;
 // 声明支持某个版本 ≠ 实现了它的全部可选特性：icons(SEP-973)、tasks(SEP-1686)、
 // elicitation 的 URL 模式等都是能力协商的可选项，本 server 只声明 tools 能力。
 // 2025-11-25 对 stdio 传输与 tools 原语是兼容的（新增项均为可选），故可声明。
