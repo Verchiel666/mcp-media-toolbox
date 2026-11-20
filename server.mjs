@@ -18,6 +18,7 @@
  */
 
 import fs from 'node:fs';
+import path from 'node:path';
 import os from 'node:os';
 import crypto from 'node:crypto';
 import readline from 'node:readline';
@@ -497,7 +498,28 @@ function extractAudio(fd, fileSize, outPath) {
 
 /* ============================ 4. 工具实现 ============================ */
 
+// 路径约束（可选）：设了 MCP_MEDIA_ROOT 就只允许读写这棵子树里的东西。
+// 不设时行为与之前完全一致（想保持"能处理任意文件"就什么都不用做）。
+const MEDIA_ROOT = process.env.MCP_MEDIA_ROOT ? fs.realpathSync(path.resolve(process.env.MCP_MEDIA_ROOT)) : null;
+function realish(abs) {
+  try { return fs.realpathSync(abs); } catch {
+    const dir = path.dirname(abs);
+    if (dir === abs) return abs;
+    try { return path.join(fs.realpathSync(dir), path.basename(abs)); } catch { return abs; }
+  }
+}
+function guardPath(p, label) {
+  if (!MEDIA_ROOT) return p;
+  if (typeof p !== "string" || !p) return p;
+  const real = realish(path.resolve(p));
+  if (real !== MEDIA_ROOT && !real.startsWith(MEDIA_ROOT + path.sep)) {
+    throw new Error(label + " 超出允许目录（MCP_MEDIA_ROOT=" + MEDIA_ROOT + "）：" + p);
+  }
+  return real;
+}
+
 function toolGetVideoInfo({ file_path }) {
+  file_path = guardPath(file_path, "file_path");
   if (!file_path || typeof file_path !== 'string') throw new Error('缺少参数 file_path');
   const st = fs.statSync(file_path);
   if (!st.isFile()) throw new Error('不是普通文件: ' + file_path);
@@ -534,6 +556,8 @@ function toolGetVideoInfo({ file_path }) {
 }
 
 function toolExtractAudio({ input_path, output_path }) {
+  input_path = guardPath(input_path, "input_path");
+  if (output_path) output_path = guardPath(output_path, "output_path");
   if (!input_path) throw new Error('缺少参数 input_path');
   const out = output_path || input_path.replace(/\.[^.]+$/, '') + '.aac';
   const st = fs.statSync(input_path);
@@ -643,6 +667,7 @@ const humanBytes = (b) => {
 
 /** 目录体检：每个文件的类型/尺寸/时长，外加按类型的汇总 */
 function toolProbeDir({ dir_path, limit = 20, sort = 'mtime', recursive = false }) {
+  dir_path = guardPath(dir_path, "dir_path");
   if (!dir_path || typeof dir_path !== 'string') throw new Error('缺少参数 dir_path');
   const st = fs.statSync(dir_path);
   if (!st.isDirectory()) throw new Error('不是目录: ' + dir_path);
@@ -699,6 +724,7 @@ function toolProbeDir({ dir_path, limit = 20, sort = 'mtime', recursive = false 
 
 /** 空间占用分析：Top 子目录 + 类型分布 + 最大文件 */
 function toolStorageReport({ path: root, top = 8, max_entries = 20000 }) {
+  root = guardPath(root, "path");
   if (!root || typeof root !== 'string') throw new Error('缺少参数 path');
   const st = fs.statSync(root);
   if (!st.isDirectory()) throw new Error('不是目录: ' + root);
@@ -736,6 +762,7 @@ function toolStorageReport({ path: root, top = 8, max_entries = 20000 }) {
 
 /** 重复文件：先按大小分组，再对候选逐个 sha256，避免无谓的读盘 */
 function toolFindDuplicates({ dir_path, min_bytes = 100 * 1024, max_files = 3000 }) {
+  dir_path = guardPath(dir_path, "dir_path");
   if (!dir_path || typeof dir_path !== 'string') throw new Error('缺少参数 dir_path');
   const st = fs.statSync(dir_path);
   if (!st.isDirectory()) throw new Error('不是目录: ' + dir_path);
@@ -940,6 +967,7 @@ function readExifOfFile(p) {
 const IMAGE_EXT = /\.(jpe?g|heic|heif|tiff?)$/i;
 
 function toolReadExif({ file_path, limit = 50 }) {
+  file_path = guardPath(file_path, "file_path");
   if (!file_path || typeof file_path !== 'string') throw new Error('缺少参数 file_path');
   const st = fs.statSync(file_path);
   if (st.isFile()) return readExifOfFile(file_path);
